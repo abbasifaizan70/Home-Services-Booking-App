@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Your Services</h1>
+
+    <!-- Search Form -->
+    <form method="get" class="mb-4">
+        <div class="row">
+            <div class="col">
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                      <option value="{{ category.id }}" 
+                        {% if request.GET.category|stringformat:"s" == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}
+                      </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Services Listing -->
+    <div class="mb-3">
+        <a href="{% url 'service_list' %}?sort=newest&category={{ request.GET.category }}" class="btn btn-info btn-sm">Newest</a>
+        <a href="{% url 'service_list' %}?sort=oldest&category={{ request.GET.category }}" class="btn btn-info btn-sm">Oldest</a>
+    </div>
+    <div class="row">
+        {% for service in page_obj %}
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ service.title }}</h5>
+                    <p class="card-text">
+                        <strong>Status:</strong> {{ service.adminactions_set.first.status }}<br>
+                        <strong>Category:</strong> {{ service.category.name }}
+                    </p>
+                    <a href="{% url 'service_detail' service.id %}" class="btn btn-primary btn-sm">View Details</a>
+                    {% if service.adminactions_set.first.status == 'Rejected' %}
+                    <div class="alert alert-warning mt-2">
+                        <p>Admin Comments: {{ service.adminactions_set.first.reason }}</p>
+                        <a href="{% url 'resolve_comments' service.id %}" class="btn btn-secondary btn-sm">Resolve Comments</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-center">No services available.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+
+    <div class="mt-4">
+        {% include 'pagination_with_category.html' with page_obj=page_obj %}
+    </div>
+</div>
+{% endblock %}

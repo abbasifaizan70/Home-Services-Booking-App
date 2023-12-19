@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <!-- Include jQuery and jQuery UI -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+
+  <style>
+    .star {
+      cursor: pointer;
+      font-size: 24px;
+      color: gold;
+    }
+  </style>
+
+  <script>
+    $(document).ready(function() {
+        var disabledDates = {{ booked_dates|safe }};
+        var today = new Date();
+        $("#bookingDate").datepicker({
+            beforeShowDay: function(date) {
+                var string = jQuery.datepicker.formatDate('yy-mm-dd', date);
+                return [disabledDates.indexOf(string) == -1 && date >= today];
+            },
+            minDate: 0,
+        }).datepicker('setDate', today);
+    });
+</script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const stars = document.querySelectorAll('.star');
+        const ratingInput = document.getElementById('reviewRating');
+
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                let rating = this.getAttribute('data-value');
+                ratingInput.value = rating;  // Set rating value in hidden input
+                updateStars(rating);  // Update visual display
+            });
+        });
+
+        function updateStars(rating) {
+            stars.forEach(star => {
+                if (star.getAttribute('data-value') <= rating) {
+                    star.innerHTML = '&#9733;';  // Filled star
+                } else {
+                    star.innerHTML = '&#9734;';  // Empty star
+                }
+            });
+        }
+    });
+</script>
+
+  <div class="container mt-4">
+    <div class="card">
+      <div class="card-body">
+        <h1 class="card-title">{{ service.title }}</h1>
+        <p class="card-text">{{ service.description }}</p>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <strong>Location:</strong> {{ service.location }}
+          </li>
+          <li class="list-group-item">
+            <strong>Price:</strong> {{ service.price }}
+          </li>
+          <li class="list-group-item">
+            <strong>Average Rating:</strong> {{ service.calculate_average_rating }}
+          </li>
+          <li class="list-group-item">
+            <strong>Category:</strong> {{ service.category.name }}
+          </li>
+          <li class="list-group-item">
+            <strong>Seller:</strong> {{ service.seller }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="card-footer">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#bookingModal">Book Service</button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addReviewModal">Add Review</button>
+        <a href="{% url 'service_reviews' service.id %}" class="btn btn-primary">View Reviews</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inside your Booking Modal in service_detail.html -->
+
+  <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="bookingModalLabel">Book Service</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="bookingForm">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="bookingDate" class="form-label">Booking Date</label>
+              <input type="text" id="bookingDate" name="bookingDate" required readonly />
+            </div>
+            <button type="button" class="btn btn-success" id="proceedToPayment">Proceed to Payment</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Review Modal -->
+  <div class="modal fade" id="addReviewModal" tabindex="-1" aria-labelledby="addReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addReviewModalLabel">Add Review</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="post" action="{% url 'submit_review' service.id %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="reviewContent" class="form-label">Your Review</label>
+              <textarea class="form-control" id="reviewContent" name="content" required></textarea>
+            </div>
+            <div class="mb-3">
+              <div class="mb-3">
+                <label for="reviewRating" class="form-label">Rating</label>
+                <div id="starRating">
+                  {# prettier-ignore-start #}
+                  {% for _ in '12345' %}
+                    <span class="star" data-value="{{ forloop.counter }}">&#9734;</span> <!-- Empty star -->
+                  {% endfor %}
+                  {# prettier-ignore-end #}
+                </div>
+                <input type="hidden" id="reviewRating" name="rating" required />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Review</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $('.datepicker').datepicker({
+      beforeShowDay: function (date) {
+        let string = jQuery.datepicker.formatDate('yy-mm-dd', date)
+        return [bookedDates.indexOf(string) == -1]
+      }
+    })
+  </script>
+
+  <script>
+    const stripe = Stripe('pk_test_51KEDlMHC505v8lRg4vOCpRwsXACJ1mf0A8xNVWuKv25guMnQ1EwGDAEdAW5CJThtj52XYZgV5gAStG0YKNRHx2TB00ServJW8M')
+    
+    document.getElementById('proceedToPayment').addEventListener('click', async () => {
+      console.log('here')
+      const bookingDate = document.getElementById('bookingDate').value
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    
+      console.log('Fetch URL:', '{% url "create_checkout_session" service.id %}')
+    
+      try {
+        const response = await fetch('{% url "create_checkout_session" service.id %}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+          },
+          body: JSON.stringify({ booking_date: bookingDate })
+        })
+    
+        const session = await response.json()
+        const result = await stripe.redirectToCheckout({ sessionId: session.id })
+    
+        if (result.error) {
+          alert(result.error.message)
+        }
+      } catch (error) {
+        console.error('Error:', error)
+      }
+    })
+  </script>
+{% endblock %}

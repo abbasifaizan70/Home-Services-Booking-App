@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load my_tags %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/service_reviews.css' %}" />
+{% endblock %}
+{% block content %}
+  <div class="container mt-4">
+    <h1 class="mb-4">Reviews for {{ service.title }}</h1>
+    <div class="list-group">
+      {% for review in reviews %}
+        <div class="list-group-item list-group-item-action">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{ review.customer.username }}</h5>
+            <div class="rating-stars">
+              {% for i in review.rating|star_range %}
+                <span class="star full">&#9733;</span> <!-- Filled star -->
+              {% endfor %}
+              {% for i in 5|star_range %}
+                {% if forloop.counter > review.rating %}
+                  <span class="star empty">&#9734;</span> <!-- Empty star -->
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          <p class="mb-1">{{ review.content }}</p>
+        </div>
+        {% empty %}
+        <div class="list-group-item">
+          <p class="text-center mb-0">No reviews yet.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

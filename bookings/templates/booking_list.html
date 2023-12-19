@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2 class="mb-4">My Bookings</h2>
+    <div class="mb-3">
+      <a href="{% url 'booking_list' %}?status=On Going" class="btn btn-info btn-sm">On Going</a>
+      <a href="{% url 'booking_list' %}?status=Completed" class="btn btn-info btn-sm">Completed</a>
+      <a href="{% url 'booking_list' %}" class="btn btn-secondary btn-sm">All</a>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Service</th>
+            <th scope="col">Booking Date</th>
+            <th scope="col">Status</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for booking in bookings %}
+            <tr>
+              <td>{{ booking.service.title }}</td>
+              <td>{{ booking.booking_date|date:'Y-m-d H:i' }}</td>
+              <td>{{ booking.status }}</td>
+              <td>
+                {% if booking.status == 'On Going' %}
+                  <form action="{% url 'complete_booking' booking.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-sm">Mark as Completed</button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
