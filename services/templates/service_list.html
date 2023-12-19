@@ -30,8 +30,15 @@
     </div>
     <div class="row">
         {% for service in page_obj %}
-        <div class="col-md-6 col-lg-4 mb-3">
+          <div class="col-md-6 col-lg-4 mb-3">
             <div class="card h-100">
+                <!-- Image at the top of the card -->
+                {% if service.sample_image %}
+                <img src="{{ service.sample_image.url }}" class="card-img-top" alt="{{ service.title }}">
+                {% else %}
+                <img src="path/to/default-image.jpg" class="card-img-top" alt="Default Image">
+                {% endif %}
+
                 <div class="card-body">
                     <h5 class="card-title">{{ service.title }}</h5>
                     <p class="card-text">
@@ -39,15 +46,16 @@
                         <strong>Category:</strong> {{ service.category.name }}
                     </p>
                     <a href="{% url 'service_detail' service.id %}" class="btn btn-primary btn-sm">View Details</a>
-                    {% if service.adminactions_set.first.status == 'Rejected' %}
-                    <div class="alert alert-warning mt-2">
-                        <p>Admin Comments: {{ service.adminactions_set.first.reason }}</p>
-                        <a href="{% url 'resolve_comments' service.id %}" class="btn btn-secondary btn-sm">Resolve Comments</a>
-                    </div>
-                    {% endif %}
+                </div>
+                <!-- Alert for Rejected Status -->
+                {% if service.adminactions_set.first.status == 'Rejected' %}
+                <div class="alert alert-warning mt-2 mb-0">
+                    <p>Admin Comments: {{ service.adminactions_set.first.reason }}</p>
+                    <a href="{% url 'resolve_comments' service.id %}" class="btn btn-secondary btn-sm">Resolve Comments</a>
+                </div>
+                {% endif %}
                 </div>
             </div>
-        </div>
         {% empty %}
         <div class="col-12">
             <p class="text-center">No services available.</p>

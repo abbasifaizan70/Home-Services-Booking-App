@@ -32,11 +32,11 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'widget_tweaks',
     'users',
     'services',
     'bookings',
     'admin_management',
-    'widget_tweaks',
     'cloudinary',
     'django.contrib.admin',
     'django.contrib.auth',

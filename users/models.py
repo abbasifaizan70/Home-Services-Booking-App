@@ -16,11 +16,12 @@ class CustomUser(AbstractUser):
     ]
 
     email = models.EmailField(unique=True, blank=False)
+    name = models.CharField(max_length=20)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     age = models.PositiveIntegerField(null=True, blank=True)
     role = models.CharField(max_length=8, choices=ROLE_CHOICES, default='CUSTOMER')
     email_confirmed = models.BooleanField(default=False)
-    profile_image = CloudinaryField('image')
+    profile_image = CloudinaryField('image', folder='Profile Images')
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

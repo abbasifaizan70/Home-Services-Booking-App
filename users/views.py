@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect
 from django.core.cache import cache
 import datetime
-from .forms import SignUpForm
+from .forms import SignUpForm,  CustomUserForm
 from django.utils import timezone
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -15,6 +15,7 @@ from django.urls import reverse
 from django.http import HttpResponse
 from .utils import account_activation_token
 from django.contrib.auth import authenticate, login
+from django.contrib import messages
 
 def signup(request):
     if request.method == 'POST':
@@ -106,3 +107,15 @@ def custom_login(request):
 
     else:
         return render(request, 'registration/login.html')
+
+def profile_view(request):
+    if request.method == 'POST':
+        form = CustomUserForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.SUCCESS, "Profile Updated!")
+            return redirect('profile')
+    else:
+        form = CustomUserForm(instance=request.user)
+
+    return render(request, 'registration/profile.html', {'form': form})

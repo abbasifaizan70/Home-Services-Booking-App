@@ -16,3 +16,13 @@ class SignUpForm(UserCreationForm):
             ('SELLER', 'Seller'),
             ('CUSTOMER', 'Customer')
         ]
+
+class CustomUserForm(forms.ModelForm):
+    profile_image = forms.ImageField(
+        label='Change profile image',
+        required=False,  # Set to False if you don't want the image to be mandatory
+        widget=forms.FileInput  # This uses the basic FileInput widget without the 'Currently' text
+    )
+    class Meta:
+        model = CustomUser
+        fields = ['name', 'gender', 'age', 'profile_image']

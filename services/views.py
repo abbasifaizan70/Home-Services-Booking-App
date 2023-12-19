@@ -73,13 +73,14 @@ def service_detail(request, service_id):
 @seller_required
 def register_service(request):
     if request.method == 'POST':
-        form = ServiceForm(request.POST)
+        form = ServiceForm(request.POST, request.FILES)  # Include request.FILES here
         if form.is_valid():
             service = form.save(commit=False)
             service.seller = request.user
             service.save()
-            messages.add_message(request, messages.SUCCESS, "Action was successful!") 
+            messages.add_message(request, messages.SUCCESS, "Service added successful!") 
             return redirect('service_list')
     else:
         form = ServiceForm()
     return render(request, 'register_service.html', {'form': form})
+
