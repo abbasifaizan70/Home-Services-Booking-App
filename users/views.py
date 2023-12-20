@@ -16,13 +16,14 @@ from django.http import HttpResponse
 from .utils import account_activation_token
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False  # Deactivate account till it is confirmed
+            user.is_active = False
             user.save()
             current_site = get_current_site(request)
             subject = 'Activate Your Account'
@@ -34,7 +35,13 @@ def signup(request):
                 'activation_link': activation_link,
             })
             user.email_user(subject, message)
-            return HttpResponse('Please confirm your email address to complete the registration')
+            messages.add_message(request, messages.ERROR, 'Please confirm your email address to complete the registration')
+            return redirect('custom_login')
+        else:
+            for field, errors in form.errors.items():
+                field_name = field.capitalize().replace('_', ' ')
+                messages.add_message(request, messages.ERROR, f"{field_name}: {errors[0]}")
+                break
     else:
         form = SignUpForm()
     return render(request, 'registration/signup.html', {'form': form})
@@ -52,7 +59,6 @@ def send_confirmation_email(request, user):
     })
     user.email_user(subject, message)
     
-    
 def activate(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
@@ -64,50 +70,46 @@ def activate(request, uidb64, token):
         user.email_confirmed = True
         user.is_active = True
         user.save()
-        return HttpResponse('Email confirmed, you can now login')
+        messages.add_message(request, messages.ERROR, 'Email confirmed, you can now login')
+        return redirect('custom_login')
     else:
-        return HttpResponse('Activation link is invalid!')
+        messages.add_message(request, messages.SUCCESS, "Activation link is invalid! Activate again.")
+        return redirect('activate')
       
 def custom_login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-
-        # Lockout key and failed attempts key
         lockout_key = f'lockout_{email}'
         attempts_key = f'attempts_{email}'
-
-        # Check for lockout
         lockout_time = cache.get(lockout_key)
         if lockout_time and timezone.now() < lockout_time:
             time_remaining = (lockout_time - timezone.now()).total_seconds()
-            return HttpResponse(f'Account locked. Try again in {int(time_remaining)} seconds.')
-
+            messages.add_message(request, messages.ERROR, f'Account locked. Try again in {int(time_remaining)} seconds.')
+            return render(request, 'registration/login.html')
         user = authenticate(request, username=email, password=password)
 
         if user is not None and user.email_confirmed:
             login(request, user)
-            # Reset the failed attempts counter and lockout key
             cache.delete(attempts_key)
             cache.delete(lockout_key)
-            return redirect('signup')  # Redirect to the desired page
+            messages.add_message(request, messages.SUCCESS, f'Login Successfully!')
+            return redirect('service_list')
         else:
-            # Increment failed attempts
             attempts = cache.get(attempts_key, 0) + 1
-            cache.set(attempts_key, attempts, timeout=60)  # Store count for 5 minutes
+            cache.set(attempts_key, attempts, timeout=300)
 
             if attempts >= 1:
-                # Lock the account for 5 minutes
                 lockout_until = timezone.now() + datetime.timedelta(minutes=1)
-                cache.set(lockout_key, lockout_until, timeout=60)
-                cache.delete(attempts_key)  # Reset attempts after lockout
-                return HttpResponse('Too many failed login attempts. Account locked for 5 minutes.')
-
+                cache.set(lockout_key, lockout_until, timeout=300)
+                cache.delete(attempts_key)
+                messages.add_message(request, messages.ERROR, 'Too many failed login attempts. Account locked for 5 minutes.')
+                return render(request, 'registration/login.html')
             return HttpResponse('Invalid login')
-
     else:
         return render(request, 'registration/login.html')
 
+@login_required
 def profile_view(request):
     if request.method == 'POST':
         form = CustomUserForm(request.POST, request.FILES, instance=request.user)
@@ -115,7 +117,11 @@ def profile_view(request):
             form.save()
             messages.add_message(request, messages.SUCCESS, "Profile Updated!")
             return redirect('profile')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    field_name = field.capitalize().replace('_', ' ')
+                    messages.add_message(request, messages.ERROR, f"{field_name}: {error}")
     else:
         form = CustomUserForm(instance=request.user)
-
     return render(request, 'registration/profile.html', {'form': form})

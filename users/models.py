@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from cloudinary.models import CloudinaryField
+from django.core.exceptions import ValidationError
 
 class CustomUser(AbstractUser):
     GENDER_CHOICES = [
@@ -16,7 +17,8 @@ class CustomUser(AbstractUser):
     ]
 
     email = models.EmailField(unique=True, blank=False)
-    name = models.CharField(max_length=20)
+    first_name = models.CharField(max_length=20)
+    last_name = models.CharField(max_length=20)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     age = models.PositiveIntegerField(null=True, blank=True)
     role = models.CharField(max_length=8, choices=ROLE_CHOICES, default='CUSTOMER')
@@ -33,3 +35,11 @@ class CustomUser(AbstractUser):
         if self.is_superuser:
             self.role = 'ADMIN'
         super(CustomUser, self).save(*args, **kwargs)
+    
+    def clean(self):
+        # Call the base class clean method
+        super().clean()
+
+        # Custom validation for age
+        if self.age is not None and self.age <= 0:
+            raise ValidationError({'Age must be greater than zero.'})

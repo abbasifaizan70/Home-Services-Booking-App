@@ -1,12 +1,78 @@
-<!-- signup.html -->
 {% extends 'base.html' %}
+{% load widget_tweaks %}
 {% block content %}
-  <div class="container my-5">
-    <h2>Sign Up</h2>
-    <form method="post">
+  <div class="container my-5 w-75 bg-white p-5 rounded-3">
+    <h1 class="mb-4 text-center fw-bold">Sign Up Now</h1>
+    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
       {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit" class="btn btn-primary">Sign up</button>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="username" class="form-label">Username</label>
+          {{ form.username|add_class:'form-control' }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="email" class="form-label">Email</label>
+          {{ form.email|add_class:'form-control' }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="password1" class="form-label">Password</label>
+          {{ form.password1|add_class:'form-control' }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="password2" class="form-label">Confirm Password</label>
+          {{ form.password2|add_class:'form-control' }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="first_name" class="form-label">First Name</label>
+          {{ form.first_name|add_class:'form-control' }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="last_name" class="form-label">Last Name</label>
+          {{ form.last_name|add_class:'form-control' }}
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="role" class="form-label">Role</label>
+        {{ form.role|add_class:'form-select' }}
+      </div>
+      <div class="mb-4">
+        <label for="profile_image" class="form-label">Profile Image</label>
+        {{ form.profile_image|add_class:'form-control' }}
+      </div>
+      <button type="submit" class="btn btn-primary">Sign Up</button>
     </form>
   </div>
+{% endblock %}
+
+{% block javascript %}
+  <script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    ;(function () {
+      'use strict'
+      window.addEventListener(
+        'load',
+        function () {
+          var forms = document.getElementsByClassName('needs-validation')
+          Array.prototype.filter.call(forms, function (form) {
+            form.addEventListener(
+              'submit',
+              function (event) {
+                if (form.checkValidity() === false) {
+                  event.preventDefault()
+                  event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+              },
+              false
+            )
+          })
+        },
+        false
+      )
+    })()
+  </script>
 {% endblock %}

@@ -1,72 +1,86 @@
 {% extends 'base.html' %}
-
+{% load static %}
+{% load custom_tags %}
+{% load my_tags %}
 {% block content %}
-<div class="container mt-4">
-    <h1 class="mb-4">Your Services</h1>
-
-    <!-- Search Form -->
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/service_reviews.css' %}" />
+{% endblock %}
+  <div class="container mt-4">
+    <div class="d-flex flex-row justify-content-between align-items-center">
+      <h1 class="mb-4">Services</h1>
+      {% if user.role|is_seller %}
+        <a href="{% url 'register_service' %}" class="btn btn-info m-0">Add New Service</a>
+      {% endif %}
+    </div>
     <form method="get" class="mb-4">
-        <div class="row">
-            <div class="col">
-                <select name="category" class="form-select">
-                    <option value="">All Categories</option>
-                    {% for category in categories %}
-                      <option value="{{ category.id }}" 
-                        {% if request.GET.category|stringformat:"s" == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}
-                      </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col">
-                <button type="submit" class="btn btn-primary">Search</button>
-            </div>
+      <div class="row">
+        <div class="col">
+          <select name="category" class="form-select">
+            <option value="">All Categories</option>
+            {% for category in categories %}
+              <option value="{{ category.id }}" {% if request.GET.category|stringformat:'s' == category.id|stringformat:'s' %}selected{% endif %}>
+                {{ category.name }}
+              </option>
+            {% endfor %}
+          </select>
         </div>
+        <div class="col">
+          <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+      </div>
     </form>
 
-    <!-- Services Listing -->
     <div class="mb-3">
-        <a href="{% url 'service_list' %}?sort=newest&category={{ request.GET.category }}" class="btn btn-info btn-sm">Newest</a>
-        <a href="{% url 'service_list' %}?sort=oldest&category={{ request.GET.category }}" class="btn btn-info btn-sm">Oldest</a>
+      <a href="{% url 'service_list' %}?sort=newest&category={{ request.GET.category }}" class="btn btn-info btn-sm">Newest</a>
+      <a href="{% url 'service_list' %}?sort=oldest&category={{ request.GET.category }}" class="btn btn-info btn-sm">Oldest</a>
     </div>
     <div class="row">
-        {% for service in page_obj %}
-          <div class="col-md-6 col-lg-4 mb-3">
-            <div class="card h-100">
-                <!-- Image at the top of the card -->
-                {% if service.sample_image %}
-                <img src="{{ service.sample_image.url }}" class="card-img-top" alt="{{ service.title }}">
-                {% else %}
-                <img src="path/to/default-image.jpg" class="card-img-top" alt="Default Image">
-                {% endif %}
-
-                <div class="card-body">
-                    <h5 class="card-title">{{ service.title }}</h5>
-                    <p class="card-text">
-                        <strong>Status:</strong> {{ service.adminactions_set.first.status }}<br>
-                        <strong>Category:</strong> {{ service.category.name }}
-                    </p>
-                    <a href="{% url 'service_detail' service.id %}" class="btn btn-primary btn-sm">View Details</a>
+      {% for service in page_obj %}
+        <div class="col-md-12 col-lg-4 mb-4">
+          <div class="card" >
+            <a class="text-decoration-none" style="color: inherit;" href="{% url 'service_detail' service.id %}">
+              <img src="{{ service.sample_image.url }}" class="card-img-top" width="100%" height="340px" alt="{{ service.title }}" />
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <p class="small"><b>Category:</b> {{ service.category.name}}</p>
                 </div>
-                <!-- Alert for Rejected Status -->
-                {% if service.adminactions_set.first.status == 'Rejected' %}
-                <div class="alert alert-warning mt-2 mb-0">
-                    <p>Admin Comments: {{ service.adminactions_set.first.reason }}</p>
-                    <a href="{% url 'resolve_comments' service.id %}" class="btn btn-secondary btn-sm">Resolve Comments</a>
+                <div class="d-flex justify-content-between align-items-end mb-3">
+                  <h3 class="mb-0">{{service.title}}</h3>
+                  <span class="text-dark mb-0">Rs.{{service.price}}</span>
                 </div>
-                {% endif %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <p class="text-muted fw-light mb-0"><b>Seller:</b> <span class="fw-bold">{{service.seller.first_name}}</span></p>
+                  <div class="ms-auto text-warning">
+                    {% if service.calculate_average_rating == "No ratings yet"%}
+                        <span>No rating yet</span>
+                    {% else %}
+                      {% for _ in service.calculate_average_rating|full_stars %}
+                          <span class="star full">&#9733;</span>
+                      {% endfor %}
+                      {% if service.calculate_average_rating|half_star %}
+                          <span class="star half">&#9734;</span>
+                      {% endif %}
+                      {% for _ in service.calculate_average_rating|empty_stars %}
+                          <span class="star empty">&#9734;</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
                 </div>
-            </div>
-        {% empty %}
-        <div class="col-12">
-            <p class="text-center">No services available.</p>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  {% if user.role|is_seller %}
+                    <strong>Status:</strong> {{ service.adminactions_set.first.status }}<br />
+                  {% endif %}
+                </div>
+              </div>
+            </a>
+          </div>
         </div>
-        {% endfor %}
+      {% endfor %}
     </div>
-
-    <!-- Pagination -->
 
     <div class="mt-4">
-        {% include 'pagination_with_category.html' with page_obj=page_obj %}
+      {% include 'pagination_with_category.html' with page_obj=page_obj %}
     </div>
-</div>
+  </div>
 {% endblock %}

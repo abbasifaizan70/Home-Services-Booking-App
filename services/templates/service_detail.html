@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
 
 {% block content %}
-  <!-- Include jQuery and jQuery UI -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
@@ -32,38 +33,37 @@
     document.addEventListener('DOMContentLoaded', function() {
         const stars = document.querySelectorAll('.star');
         const ratingInput = document.getElementById('reviewRating');
-
         stars.forEach(star => {
             star.addEventListener('click', function() {
                 let rating = this.getAttribute('data-value');
-                ratingInput.value = rating;  // Set rating value in hidden input
-                updateStars(rating);  // Update visual display
+                ratingInput.value = rating;
+                updateStars(rating);
             });
         });
 
         function updateStars(rating) {
             stars.forEach(star => {
                 if (star.getAttribute('data-value') <= rating) {
-                    star.innerHTML = '&#9733;';  // Filled star
+                    star.innerHTML = '&#9733;';
                 } else {
-                    star.innerHTML = '&#9734;';  // Empty star
+                    star.innerHTML = '&#9734;';
                 }
             });
         }
     });
 </script>
 
-  <div class="container mt-4">
+  <div class="container shadow mt-4 p-4 w-50 rounded">
     <div class="card">
       <div class="card-body">
-        <h1 class="card-title">{{ service.title }}</h1>
-        <p class="card-text">{{ service.description }}</p>
+        <h1 class="card-title text-center">{{ service.title }}</h1>
+        <p class="card-text fw-light">{{ service.description }}</p>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
             <strong>Location:</strong> {{ service.location }}
           </li>
           <li class="list-group-item">
-            <strong>Price:</strong> {{ service.price }}
+            <strong>Price:</strong> Rs. {{ service.price|floatformat:'0' }}
           </li>
           <li class="list-group-item">
             <strong>Average Rating:</strong> {{ service.calculate_average_rating }}
@@ -72,20 +72,41 @@
             <strong>Category:</strong> {{ service.category.name }}
           </li>
           <li class="list-group-item">
-            <strong>Seller:</strong> {{ service.seller }}
+            <strong>Seller:</strong> {{ service.seller.first_name }}
           </li>
+          <li class="list-group-item">
+            {% if service.sample_image %}
+              <img src="{{ service.sample_image.url }}" class="card-img-top" alt="{{ service.title }}" />
+            {% else %}
+              <img src="{% static 'images/services-default-image.jpeg' %}" class="card-img-top" alt="Default Image" />
+            {% endif %}
+          </li>
+          {% if user.role|is_seller %}
+            {% if service.adminactions_set.first.status == 'Rejected' %}
+              <li class="list-group-item">
+                <div class="mt-2 mb-0">
+                  <p class="mb-2">Admin Comments: {{ service.adminactions_set.first.reason }}</p>
+                  <a href="{% url 'resolve_comments' service.id %}" class="btn btn-secondary btn-sm">Resolve Comments</a>
+                </div>
+              </li>
+            {% endif %}
+          {% endif %}
         </ul>
       </div>
-
       <div class="card-footer">
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#bookingModal">Book Service</button>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addReviewModal">Add Review</button>
-        <a href="{% url 'service_reviews' service.id %}" class="btn btn-primary">View Reviews</a>
+        {% if user.is_authenticated %}
+          {% if user.role|is_customer %}
+            <button type="button" class="btn btn-success border-3" data-bs-toggle="modal" data-bs-target="#bookingModal">Book Service</button>
+            <button type="button" class="btn btn-primary border-3" data-bs-toggle="modal" data-bs-target="#addReviewModal">Add Review</button>
+          {% endif %}
+        {% else %}
+          <a href="{% url 'login' %}" class="btn btn-success border-3">Book Service</a>
+          <a href="{% url 'login' %}" class="btn btn-success border-3">Add Review</a>
+        {% endif %}
+        <a href="{% url 'service_reviews' service.id %}" class="btn btn-primary border-3">View Reviews</a>
       </div>
     </div>
   </div>
-
-  <!-- Inside your Booking Modal in service_detail.html -->
 
   <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -108,7 +129,6 @@
     </div>
   </div>
 
-  <!-- Add Review Modal -->
   <div class="modal fade" id="addReviewModal" tabindex="-1" aria-labelledby="addReviewModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -128,9 +148,9 @@
                 <label for="reviewRating" class="form-label">Rating</label>
                 <div id="starRating">
                   {# prettier-ignore-start #}
-                  {% for _ in '12345' %}
-                    <span class="star" data-value="{{ forloop.counter }}">&#9734;</span> <!-- Empty star -->
-                  {% endfor %}
+                    {% for _ in '12345' %}
+                      <span class="star" data-value="{{ forloop.counter }}">&#9734;</span>
+                    {% endfor %}
                   {# prettier-ignore-end #}
                 </div>
                 <input type="hidden" id="reviewRating" name="rating" required />
@@ -154,14 +174,11 @@
 
   <script>
     const stripe = Stripe('pk_test_51KEDlMHC505v8lRg4vOCpRwsXACJ1mf0A8xNVWuKv25guMnQ1EwGDAEdAW5CJThtj52XYZgV5gAStG0YKNRHx2TB00ServJW8M')
-    
     document.getElementById('proceedToPayment').addEventListener('click', async () => {
       console.log('here')
       const bookingDate = document.getElementById('bookingDate').value
       const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
-    
-      console.log('Fetch URL:', '{% url "create_checkout_session" service.id %}')
-    
+  
       try {
         const response = await fetch('{% url "create_checkout_session" service.id %}', {
           method: 'POST',

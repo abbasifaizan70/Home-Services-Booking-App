@@ -1,28 +1,30 @@
+# forms.py in the same Django app directory
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser
+from .mixins import AgeValidationMixin  # Import the mixin
 
-class SignUpForm(UserCreationForm):
+class SignUpForm(AgeValidationMixin, UserCreationForm):
     email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
 
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'password1', 'password2', 'first_name', 'last_name', 'role')
+        fields = ('username', 'email', 'password1', 'password2', 'first_name', 'last_name', 'role', 'profile_image')
 
     def __init__(self, *args, **kwargs):
         super(SignUpForm, self).__init__(*args, **kwargs)
-        # Update the choices for the role field
         self.fields['role'].choices = [
             ('SELLER', 'Seller'),
             ('CUSTOMER', 'Customer')
         ]
 
-class CustomUserForm(forms.ModelForm):
+class CustomUserForm(AgeValidationMixin, forms.ModelForm):
     profile_image = forms.ImageField(
         label='Change profile image',
-        required=False,  # Set to False if you don't want the image to be mandatory
-        widget=forms.FileInput  # This uses the basic FileInput widget without the 'Currently' text
+        required=False,
+        widget=forms.FileInput
     )
+
     class Meta:
         model = CustomUser
-        fields = ['name', 'gender', 'age', 'profile_image']
+        fields = ['first_name', 'last_name', 'gender', 'age', 'profile_image']

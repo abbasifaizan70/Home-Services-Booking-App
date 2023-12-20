@@ -12,6 +12,10 @@
           <div class="card-body">
             <form method="post" enctype="multipart/form-data">
               {% csrf_token %}
+              <div class="mb-3">{{ form.first_name.label_tag }}
+                {{ form.first_name|add_class:'form-control' }}</div>
+              <div class="mb-3">{{ form.last_name.label_tag }}
+                {{ form.last_name|add_class:'form-control' }}</div>
               <div class="mb-3">{{ form.username.label_tag }}
                 {{ form.name|add_class:'form-control' }}</div>
               <div class="mb-3">{{ form.gender.label_tag }}
@@ -25,7 +29,7 @@
                     <img src="{{ form.instance.profile_image.url }}" alt="Profile Image" class="img-thumbnail" />
                   </div>
                 {% endif %}
-                {{ form.profile_image.label_tag }} <!-- Custom label from the form -->
+                {{ form.profile_image.label_tag }}
                 {{ form.profile_image }}
               </div>
               <button type="submit" class="btn btn-primary">Save</button>

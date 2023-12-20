@@ -1,24 +1,22 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+
+from users.views import custom_login
 from .models import Service, Booking
 from django.urls import reverse
 from .forms import BookingForm, ReviewForm
 import stripe
 from .models import Review
 from datetime import datetime
-from django.utils.dateparse import parse_date
-
 from django.shortcuts import get_object_or_404
 import json
-
 from django.contrib import messages
-
 from django.conf import settings
-
 from django.http import JsonResponse
-
+from users.decorators import customer_required
 
 @login_required
+@customer_required
 def book_service(request, service_id):
     service = Service.objects.get(id=service_id)
     if request.method == 'POST':
@@ -38,6 +36,7 @@ def booking_success(request):
     return render(request, 'booking_success.html')
 
 @login_required
+@customer_required
 def add_review(request, service_id):
     service = Service.objects.get(id=service_id)
     if request.method == 'POST':
@@ -53,9 +52,13 @@ def add_review(request, service_id):
 
     return render(request, 'add_review.html', {'form': form, 'service': service})
 
+@login_required
+@customer_required
 def review_success(request):
     return render(request, 'review_success.html')
 
+@login_required
+@customer_required
 def create_checkout_session(request, service_id):
     stripe.api_key = settings.STRIPE_SECRET_KEY  
     if request.method == 'POST':
@@ -82,12 +85,16 @@ def create_checkout_session(request, service_id):
 
         return JsonResponse({'id': checkout_session.id})
 
+@login_required
+@customer_required
 def payment_success(request, service_id):
     booking_date = datetime.strptime(request.GET.get('booking_date'), '%m/%d/%Y')
     Booking.objects.create(customer=request.user, service_id=service_id, booking_date=booking_date)
     messages.add_message(request, messages.SUCCESS, "Booking has been done successfully!")
     return redirect('booking_list')
 
+@login_required
+@customer_required
 def booking_list(request):
     status_filter = request.GET.get('status')
     user_bookings = Booking.objects.filter(customer=request.user).order_by('-booking_date')
@@ -95,8 +102,8 @@ def booking_list(request):
         user_bookings = user_bookings.filter(status=status_filter)
     return render(request, 'booking_list.html', {'bookings': user_bookings})
   
-  
 @login_required
+@customer_required
 def complete_booking(request, booking_id):
     if request.method == 'POST':
         booking = get_object_or_404(Booking, pk=booking_id, customer=request.user, status='On Going')
@@ -105,8 +112,9 @@ def complete_booking(request, booking_id):
         return redirect('booking_list')
     else:
         return redirect('booking_list')
-      
-      
+
+@login_required
+@customer_required
 def submit_review(request, service_id):
     if request.method == 'POST':
         content = request.POST.get('content')
@@ -119,4 +127,3 @@ def submit_review(request, service_id):
         )
         messages.add_message(request, messages.SUCCESS, "Review has been added successfully!")
         return redirect('service_reviews', service_id=service_id)
-  
