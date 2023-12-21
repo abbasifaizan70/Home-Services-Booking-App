@@ -31,6 +31,7 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'home-services.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://home-services.up.railway.app']
 
 # Application definition
 INSTALLED_APPS = [
