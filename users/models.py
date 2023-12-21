@@ -37,9 +37,6 @@ class CustomUser(AbstractUser):
         super(CustomUser, self).save(*args, **kwargs)
     
     def clean(self):
-        # Call the base class clean method
         super().clean()
-
-        # Custom validation for age
         if self.age is not None and self.age <= 0:
             raise ValidationError({'Age must be greater than zero.'})

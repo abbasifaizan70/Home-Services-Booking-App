@@ -20,7 +20,7 @@ from django.contrib.auth.decorators import login_required
 
 def signup(request):
     if request.method == 'POST':
-        form = SignUpForm(request.POST)
+        form = SignUpForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = False
@@ -35,7 +35,7 @@ def signup(request):
                 'activation_link': activation_link,
             })
             user.email_user(subject, message)
-            messages.add_message(request, messages.ERROR, 'Please confirm your email address to complete the registration')
+            messages.add_message(request, messages.SUCCESS, 'Please confirm your email address to complete the registration')
             return redirect('custom_login')
         else:
             for field, errors in form.errors.items():
@@ -70,10 +70,10 @@ def activate(request, uidb64, token):
         user.email_confirmed = True
         user.is_active = True
         user.save()
-        messages.add_message(request, messages.ERROR, 'Email confirmed, you can now login')
+        messages.add_message(request, messages.SUCCESS, 'Email confirmed, you can now login')
         return redirect('custom_login')
     else:
-        messages.add_message(request, messages.SUCCESS, "Activation link is invalid! Activate again.")
+        messages.add_message(request, messages.ERROR, "Activation link is invalid! Activate again.")
         return redirect('activate')
       
 def custom_login(request):

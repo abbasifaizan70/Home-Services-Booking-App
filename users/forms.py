@@ -6,6 +6,11 @@ from .mixins import AgeValidationMixin  # Import the mixin
 
 class SignUpForm(AgeValidationMixin, UserCreationForm):
     email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
+    profile_image = forms.ImageField(
+        label='Change profile image',
+        required=False,
+        widget=forms.FileInput
+    )
 
     class Meta:
         model = CustomUser

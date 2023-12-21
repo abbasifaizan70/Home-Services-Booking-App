@@ -12,25 +12,27 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 import cloudinary
 from pathlib import Path
+import environ
+
+env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%1bt=)mu8opu5v55!@ufsvra*otb3j(ipguv9kd6ait0(=p0q+'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'widget_tweaks',
     'users',
@@ -83,11 +85,11 @@ HANDLER403 =  "users.views.handler403"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Home_Services_App',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST'),
+        'PORT': env('DB_PORT'),
     }
 }
 
@@ -127,7 +129,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+  BASE_DIR / "static",
 ]
 
 # Default primary key field type
@@ -143,20 +145,18 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 AUTH_USER_MODEL = 'users.CustomUser'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'faizan.shoukat@devsinc.com'
-EMAIL_HOST_PASSWORD = 'cbfx yerz rjmx sfqq'
-EMAIL_USE_TLS = True
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT =  env('EMAIL_PORT')
+EMAIL_HOST_USER =  env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD =  env('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS =  env('EMAIL_USE_TLS')
 
 
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51KEDlMHC505v8lRg4vOCpRwsXACJ1mf0A8xNVWuKv25guMnQ1EwGDAEdAW5CJThtj52XYZgV5gAStG0YKNRHx2TB00ServJW8M'
-STRIPE_SECRET_KEY = 'sk_test_51KEDlMHC505v8lRgU2PaCzqsgzvBAcIYdxUptQRlJWZEunNlmesWHhLpKCmwblMCLO5T0cjQmCv7FRRTITWQViif004ClnZKZc'
+STRIPE_PUBLISHABLE_KEY =  env('STRIPE_PUBLISHABLE_KEY')
+STRIPE_SECRET_KEY =  env('STRIPE_SECRET_KEY')
 
-
-          
 cloudinary.config( 
-  cloud_name = "diadzifvn", 
-  api_key = "932256785186793", 
-  api_secret = "zz-pB6oVAw3J8CTq1oyh0DoR28s" 
+  cloud_name =  env('CLOUDINARY_CLOUD_NAME'), 
+  api_key =  env('CLOUDINARY_API_KEY'), 
+  api_secret =  env('CLOUDINARY_API_SECRET') 
 )
