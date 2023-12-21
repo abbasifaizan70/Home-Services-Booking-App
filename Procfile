@@ -1,0 +1,1 @@
+web: gunicorn 'home_services_app.wsgi'

@@ -1,0 +1,19 @@
+.rating-stars {
+  color: #ffc107;
+  /* Gold color */
+  font-size: 1rem;
+}
+
+.rating-stars .star {
+  display: inline-block;
+}
+
+.rating-stars .star.full {
+  content: "\2605";
+  /* Filled star */
+}
+
+.rating-stars .star.empty {
+  content: "\2606";
+  /* Empty star */
+}
