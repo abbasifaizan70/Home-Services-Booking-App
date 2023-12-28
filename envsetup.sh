@@ -3,7 +3,7 @@
 if [ -d "env" ]; then
     echo "Python virtual environment exists."
 else
-    python -m venv env
+    /Library/Frameworks/Python.framework/Versions/3.12/bin/python3 -m venv env
 fi
 
 # Activate the virtual environment
