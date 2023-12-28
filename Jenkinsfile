@@ -1,9 +1,5 @@
 pipeline{
-    agent {
-      docker {
-            image 'python:3.12.0'
-        }
-    }
+    agent any
     stages {
       
         stage('Setup Python Virtual ENV for dependencies'){
