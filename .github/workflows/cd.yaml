@@ -1,0 +1,30 @@
+name: Deploy to Railway
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: actions/setup-docker@v2
+        with:
+          dockerfile: Dockerfile
+
+      - name: Build Docker Image
+        run: docker build -t my-docker-image .
+
+      - name: Log in to Railway
+        run: |
+          npm install -g @railway/cli
+          railway login --token c1d107e8-bdc8-4a53-8192-484373043a0f
+
+      - name: Deploy to Railway
+        run: railway run --command="railway up"
