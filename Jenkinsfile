@@ -1,6 +1,9 @@
 pipeline {
     agent any
-
+    environment {
+        DOCKER_COMPOSE_PATH = '/var/jenkins_home/docker-compose'
+        POSTGRES_COMPOSE_FILE = 'postgres-docker-compose.yaml'
+    }
     stages {
         stage('Install Docker Compose') {
           steps {
@@ -14,17 +17,7 @@ pipeline {
         stage('Build and Deploy') {
             steps {
                 script {
-                    // Set the path to your Docker Compose file
-                    // def dockerComposeFile = "docker-compose.yaml"
-
-                    // Build and start services defined in the Docker Compose file
-                    sh "docker-compose -f postgres-docker-compose.yaml up --build -d"
-
-                    // Additional steps or commands as needed for your deployment
-                    // ...
-
-                    // Stop and remove the containers when done
-                    // sh "docker-compose -f ${dockerComposeFile} down"
+                    sh "$DOCKER_COMPOSE_PATH -f $POSTGRES_COMPOSE_FILE up --build -d"
                 }
             }
         }
