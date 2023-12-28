@@ -7,16 +7,22 @@ pipeline{
 
     stages {
       stage('Print Docker Compose Path') {
-            steps {
+        stage('Build'){
+          steps {
                 script {
-                    // Run a command to find the path to docker-compose
-                    def dockerComposePath = sh(script: 'which docker-compose', returnStdout: true).trim()
-                    // Print the path to the console
-                    echo "Docker Compose Path: ${dockerComposePath}"
+                    // Set the path to your Docker Compose file
+                    def dockerComposeFile = "postgres-docker-compose.yaml"
+
+                    // Build and start services defined in the Docker Compose file
+                    sh "docker-compose -f ${dockerComposeFile} up --build -d"
+
+                    // Additional steps or commands as needed for your deployment
+                    // ...
+
+                    // Stop and remove the containers when done
+                    // sh "docker-compose -f ${dockerComposeFile} down"
                 }
             }
-        }
-        stage('Build'){
             steps {
                 sh '''
                 docker-compose -f postgres-docker-compose.yaml up --build
