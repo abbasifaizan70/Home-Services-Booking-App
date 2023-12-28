@@ -6,6 +6,16 @@ pipeline{
     }
 
     stages {
+      stage('Print Docker Compose Path') {
+            steps {
+                script {
+                    // Run a command to find the path to docker-compose
+                    def dockerComposePath = sh(script: 'which docker-compose', returnStdout: true).trim()
+                    // Print the path to the console
+                    echo "Docker Compose Path: ${dockerComposePath}"
+                }
+            }
+        }
         stage('Build'){
             steps {
                 sh '''
