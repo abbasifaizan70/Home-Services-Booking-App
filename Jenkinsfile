@@ -1,44 +1,29 @@
-pipeline {
+pipeline{
     agent any
-
     stages {
-        stage('Checkout') {
+        stage('Setup Python Virtual ENV for dependencies'){
             steps {
-                // Check out the source code from your version control system
-                echo 'Checkout the Applications...'
+                sh '''
+                chmod +x envsetup.sh
+                ./envsetup.sh
+                '''
             }
         }
-
-        stage('Build') {
+        stage('Setup Gunicorn Setup'){
             steps {
-                // Build your application (replace with your build tool and commands)
-                 echo 'Build the Applications...'
+                sh '''
+                chmod +x gunicorn.sh
+                ./gunicorn.sh
+                '''
             }
         }
-
-        stage('Test') {
+        stage('setup NGINX'){
             steps {
-                // Run tests (replace with your testing tool and commands)
-                 echo 'Test the Applications...'
+                sh '''
+                chmod +x nginx.sh
+                ./nginx.sh
+                '''
             }
-        }
-
-        stage('Deploy') {
-            steps {
-                // Deploy your application (replace with your deployment commands)
-                 echo 'Deploy the Applications...'
-            }
-        }
-    }
-
-    post {
-        success {
-            // This block is executed if the pipeline succeeds
-            echo 'Pipeline succeeded! Send notifications, etc.'
-        }
-        failure {
-            // This block is executed if the pipeline fails
-            echo 'Pipeline failed! Send notifications, etc.'
         }
     }
 }
