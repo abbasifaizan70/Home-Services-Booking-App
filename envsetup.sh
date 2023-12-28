@@ -1,13 +1,13 @@
 #!/bin/bash
 
-if [ -d "venv" ] 
+if [ -d "env" ] 
 then
     echo "Python virtual environment exists." 
 else
-    python3 -m venv venv
+    python3 -m venv env
 fi
 
-source venv/bin/activate
+source env/bin/activate
 
 
 pip3 install -r requirements.txt
