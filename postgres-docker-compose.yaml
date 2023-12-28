@@ -6,3 +6,11 @@ services:
       - 5001:5432
     environment:
       POSTGRES_PASSWORD: "postgres"
+  home_services_dango_app:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres_server

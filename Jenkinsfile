@@ -1,30 +1,28 @@
 pipeline{
     agent any
     stages {
-      
-        stage('Setup Python Virtual ENV for dependencies'){
+        stage('Build'){
             steps {
                 sh '''
-                chmod +x envsetup.sh
-                ./envsetup.sh
+                docker-compose -f postgres-docker-compose.yaml up --build
                 '''
             }
         }
-        stage('Setup Gunicorn Setup'){
-            steps {
-                sh '''
-                chmod +x gunicorn.sh
-                ./gunicorn.sh
-                '''
-            }
-        }
-        stage('setup NGINX'){
-            steps {
-                sh '''
-                chmod +x nginx.sh
-                ./nginx.sh
-                '''
-            }
-        }
+        // stage('Setup Gunicorn Setup'){
+        //     steps {
+        //         sh '''
+        //         chmod +x gunicorn.sh
+        //         ./gunicorn.sh
+        //         '''
+        //     }
+        // }
+        // stage('setup NGINX'){
+        //     steps {
+        //         sh '''
+        //         chmod +x nginx.sh
+        //         ./nginx.sh
+        //         '''
+        //     }
+        // }
     }
 }
