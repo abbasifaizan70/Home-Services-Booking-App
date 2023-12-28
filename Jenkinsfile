@@ -2,10 +2,12 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+      stage('Install Docker Compose') {
             steps {
-                // Checkout your code from the repository
-                checkout scm
+                script {
+                    sh 'sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose'
+                    sh 'sudo chmod +x /usr/local/bin/docker-compose'
+                }
             }
         }
 
@@ -13,10 +15,10 @@ pipeline {
             steps {
                 script {
                     // Set the path to your Docker Compose file
-                    def dockerComposeFile = "docker-compose.yaml"
+                    // def dockerComposeFile = "docker-compose.yaml"
 
                     // Build and start services defined in the Docker Compose file
-                    sh "docker-compose -f ${dockerComposeFile} up --build -d"
+                    sh "docker-compose -f postgres-docker-compose.yaml up --build -d"
 
                     // Additional steps or commands as needed for your deployment
                     // ...
