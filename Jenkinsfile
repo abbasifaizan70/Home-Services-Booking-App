@@ -5,11 +5,11 @@ pipeline {
         stage('Install Docker Compose') {
           steps {
               script {
-                  sh 'curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose'
-                  sh 'chmod +x /usr/local/bin/docker-compose'
+                  sh 'curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /var/jenkins_home/docker-compose'
+                  sh 'chmod +x /var/jenkins_home/docker-compose'
               }
           }
-      }
+        }
 
         stage('Build and Deploy') {
             steps {
