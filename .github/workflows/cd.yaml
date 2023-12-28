@@ -19,7 +19,7 @@ jobs:
           dockerfile: Dockerfile
 
       - name: Build Docker Image
-        run: docker build -t my-docker-image .
+        run: docker build -t my-docker-image:latest .
 
       - name: Log in to Railway
         run: |
