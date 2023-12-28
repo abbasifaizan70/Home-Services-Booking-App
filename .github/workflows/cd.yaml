@@ -25,7 +25,9 @@ jobs:
       - name: Log in to Railway
         run: |
           npm install -g @railway/cli
-          railway login --token c1d107e8-bdc8-4a53-8192-484373043a0f
+          railway login
+          env:
+            RAILWAY_API_TOKEN: c1d107e8-bdc8-4a53-8192-484373043a0f
 
       - name: Deploy to Railway
         run: railway run --command="railway up"
