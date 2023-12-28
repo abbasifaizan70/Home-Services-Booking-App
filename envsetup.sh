@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sudo apt install python3.12.0-venv
+
 if [ -d "env" ] 
 then
     echo "Python virtual environment exists." 
