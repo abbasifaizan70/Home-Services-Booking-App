@@ -17,9 +17,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Docker
-        uses: actions/setup-docker@v2
-        with:
-          dockerfile: Dockerfile
+        uses: docker/setup-buildx-action@v1
 
       - name: Build Docker Image
         run: docker build -t my-docker-image:latest .
