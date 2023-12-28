@@ -1,0 +1,9 @@
+version: '1.0'
+services:
+  web:
+    image: my-docker-image:latest
+    env_file: .env
+    ports:
+      - 8000:8000
+    env:
+      - DJANGO_SETTINGS_MODULE=myapp.settings.production
