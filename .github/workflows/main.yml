@@ -19,6 +19,8 @@ jobs:
           registry: ${{ secrets.AWS_REGISTRY_URL }}
           region: ap-southeast-2
           mask-password: true
+          registry-type: 'private'
+          skip-logout: false
 
       - name: Build and push Docker image to ECR
         run: |
