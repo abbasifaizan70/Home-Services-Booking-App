@@ -20,6 +20,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Set correct permissions for SSH key
+        run: |
+          chmod 600 ./key_pair.pem
+
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
@@ -33,6 +37,6 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          ssh -i ./SSH.pem ec2-user@3.26.189.110 "docker stop home_services_app || true"
-          ssh -i ./SSH.pem ec2-user@3.26.189.110 "docker rm home_services_app || true"
-          ssh -i ./SSH.pem ec2-user@3.26.189.110 "docker run -d --name home_services_app -p 80:80 $ECR_REGISTRY/$ECR_REPOSITORY:latest-$IMAGE_TAG"
+          ssh -i ./key_pair.pem ec2-user@13.57.191.175 "docker stop home_services_app || true"
+          ssh -i ./key_pair.pem ec2-user@13.57.191.175 "docker rm home_services_app || true"
+          ssh -i ./key_pair.pem ec2-user@13.57.191.175 "docker run -d --name home_services_app -p 80:80 $ECR_REGISTRY/$ECR_REPOSITORY:latest-$IMAGE_TAG"
