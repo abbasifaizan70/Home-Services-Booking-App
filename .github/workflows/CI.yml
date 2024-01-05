@@ -8,10 +8,6 @@ jobs:
     name: Build Docker Image & Push to ECR
     runs-on: ubuntu-latest  
     steps:
-        - name: Setup Docker
-          uses: docker/setup-docker@v2
-          with:
-            version: 'latest'
 
         - name: Checkout
           uses: actions/checkout@v2    
