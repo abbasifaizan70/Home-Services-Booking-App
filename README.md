@@ -6,6 +6,8 @@ With a home service application, sellers can register their services, and custom
 With a home service application, sellers can register their services, and customers can easily book and avail them. Services such as cleaning, electrician, plumbing, paint, and more are available. An admin can approve or reject newly added service by sellers, and customers can review and rate their experiences after availing a service. 
 Furthermore, a single seller can add multiple services and customers can avail multiple services simultaneously
 
+
+
 ### Registration and Authorization:
 #### User can be a: 
 - Customer
