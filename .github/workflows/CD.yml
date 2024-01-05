@@ -22,7 +22,8 @@ jobs:
 
       - name: Set correct permissions for SSH key
         run: |
-          chmod 600 ./key_pair.pem
+          mv ./key_pair.pem /tmp/key_pair.pem
+          chmod 600 /tmp/key_pair.pem
 
       - name: Log in to Amazon ECR
         id: login-ecr
@@ -37,6 +38,6 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          ssh -i ./key_pair.pem ec2-user@13.57.191.175 "docker stop home_services_app || true"
-          ssh -i ./key_pair.pem ec2-user@13.57.191.175 "docker rm home_services_app || true"
-          ssh -i ./key_pair.pem ec2-user@13.57.191.175 "docker run -d --name home_services_app -p 80:80 $ECR_REGISTRY/$ECR_REPOSITORY:latest-$IMAGE_TAG"
+          ssh -i /tmp/key_pair.pem ec2-user@13.57.191.175 "docker stop home_services_app || true"
+          ssh -i /tmp/key_pair.pem ec2-user@13.57.191.175 "docker rm home_services_app || true"
+          ssh -i /tmp/key_pair.pem ec2-user@13.57.191.175 "docker run -d --name home_services_app -p 80:80 $ECR_REGISTRY/$ECR_REPOSITORY:latest-$IMAGE_TAG"
