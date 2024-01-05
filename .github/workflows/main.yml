@@ -1,0 +1,26 @@
+name: CI - Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Login to AWS ECR
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry: ${{ secrets.AWS_REGISTRY_URL }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Build and push Docker image to ECR
+        run: |
+          docker build -t ${{ secrets.AWS_REGISTRY_URL }}/main:latest .
+          docker push ${{ secrets.AWS_REGISTRY_URL }}/main:latest
