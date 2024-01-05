@@ -9,11 +9,7 @@ jobs:
     runs-on: ubuntu-latest  
     steps:
         - name: Checkout
-          uses: actions/checkout@v2    
-          
-        - name: Debug AWS Region
-          run:  | 
-            echo "AWS_REGION: ${{ secrets.AWS_REGION }}"
+          uses: actions/checkout@v2
 
         - name: Setup AWS ECR Details
           uses: aws-actions/configure-aws-credentials@v1
