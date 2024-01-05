@@ -4,6 +4,14 @@ on:
   push:
     branches: [ master ]
 
+env:
+  AWS_REGION: ap-southeast-2                   # set this to your preferred AWS region, e.g. us-west-1
+  ECR_REPOSITORY: 827738977258.dkr.ecr.ap-southeast-2.amazonaws.com/home_services_app_image           # set this to your Amazon ECR repository name
+  ECS_SERVICE: MY_ECS_SERVICE                 # set this to your Amazon ECS service name
+  ECS_CLUSTER: MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
+  ECS_TASK_DEFINITION: MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
+  CONTAINER_NAME: MY_CONTAINER_NAME           # set this to the name of the container in the
+
 jobs:
   deploy:
     name: Deploy
@@ -19,7 +27,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+        aws-region: ${{ env.AWS_REGION }}
 
     - name: Login to Amazon ECR
       id: login-ecr
