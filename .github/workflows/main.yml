@@ -1,11 +1,10 @@
 name: Cypress Docker Push
 on: 
   push: 
-    branches: [ "master" ]
+    branches: [ "main" ]
   
 jobs:
-  Cypress-Test:
-  
+  Docker-Push:
     name: Build Docker Image
     runs-on: ubuntu-latest  
     steps:  
