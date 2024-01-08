@@ -28,7 +28,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'home-services.up.railway.app','54.219.140.88']
 CSRF_TRUSTED_ORIGINS = ['https://home-services.up.railway.app','54.219.140.88']
