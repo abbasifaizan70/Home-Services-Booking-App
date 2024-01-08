@@ -30,8 +30,8 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'home-services.up.railway.app', '0.0.0.0', '54.219.140.88/', 'ec2-54-219-140-88.us-west-1.compute.amazonaws.com']
-CSRF_TRUSTED_ORIGINS = ['https://home-services.up.railway.app','54.219.140.88', 'ec2-54-219-140-88.us-west-1.compute.amazonaws.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'home-services.up.railway.app', '0.0.0.0', '54.219.140.88', 'ec2-54-219-140-88.us-west-1.compute.amazonaws.com']
+CSRF_TRUSTED_ORIGINS = ['https://home-services.up.railway.app','https://54.219.140.88', 'https://ec2-54-219-140-88.us-west-1.compute.amazonaws.com']
 
 # Application definition
 INSTALLED_APPS = [
