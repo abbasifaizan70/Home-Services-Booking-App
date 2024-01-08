@@ -36,8 +36,18 @@ jobs:
 
           docker pull $ECR_REGISTRY:latest-$IMAGE_TAG
 
-      - name: Deploy to EC2
+      - uses: actions/checkout@v2 
+      - name: Build & Deploy
+        env:
+            PRIVATE_KEY: ${{ secrets.AWS_SSH_KEY }}
+            HOSTNAME: ubuntu@ec2-54-219-140-88.us-west-1.compute.amazonaws.com
+            USER_NAME: ubuntu
+      
         run: |
-          ssh -i /tmp/key_pair.pem ec2-user@13.57.191.175 "docker stop home_services_app || true"
-          ssh -i /tmp/key_pair.pem ec2-user@13.57.191.175 "docker rm home_services_app || true"
-          ssh -i /tmp/key_pair.pem ec2-user@13.57.191.175 "docker run -d --name home_services_app -p 80:80 $ECR_REGISTRY/$ECR_REPOSITORY:latest-$IMAGE_TAG"
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME}
+          '
+          cd Home-Services-Booking-App &&
+          git checkout main &&
+          docker-compose -f docker-compose.yaml up -d --build
+          '
