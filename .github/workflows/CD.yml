@@ -36,18 +36,14 @@ jobs:
 
           docker pull $ECR_REGISTRY:latest-$IMAGE_TAG
 
-      - uses: actions/checkout@v2 
       - name: Build & Deploy
         env:
-            PRIVATE_KEY: ${{ secrets.AWS_SSH_KEY }}
-            HOSTNAME: ubuntu@ec2-54-219-140-88.us-west-1.compute.amazonaws.com
-            USER_NAME: ubuntu
-      
+          HOSTNAME: ec2-54-219-140-88.us-west-1.compute.amazonaws.com
+          USER_NAME: ubuntu
+
         run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME}
-          '
-          cd Home-Services-Booking-App &&
-          git checkout main &&
-          docker-compose -f docker-compose.yaml up -d --build
+          ssh -o StrictHostKeyChecking=no -i /tmp/key_pair.pem ${USER_NAME}@${HOSTNAME} '
+            cd Home-Services-Booking-App &&
+            git checkout main &&
+            docker-compose -f docker-compose.yaml up -d --build
           '
