@@ -48,6 +48,8 @@ jobs:
             git checkout main &&
             git pull origin main &&
             docker-compose -f docker-compose.yml up -d --build &&
-            docker-compose exec -T home-services-booking-app-home_services_dango_app-1 python manage.py makemigrations &&
-            docker-compose exec -T home-services-booking-app-home_services_dango_app-1 python manage.py migrate
+            sleep 10 &&  # Wait for 10 seconds to ensure the service is up
+            docker-compose exec -T home_services_dango_app python manage.py makemigrations &&
+            docker-compose exec -T home_services_dango_app python manage.py migrate
           '
+
