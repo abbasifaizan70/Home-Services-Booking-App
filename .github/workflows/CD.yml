@@ -48,6 +48,6 @@ jobs:
             git checkout main &&
             git pull origin main &&
             docker-compose -f docker-compose.yml up -d --build &&
-            docker-compose exec -T web python manage.py makemigrations &&
-            docker-compose exec -T web python manage.py migrate
+            docker-compose exec -T home-services-booking-app-home_services_dango_app-1 python manage.py makemigrations &&
+            docker-compose exec -T home-services-booking-app-home_services_dango_app-1 python manage.py migrate
           '
